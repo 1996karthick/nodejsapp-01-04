@@ -1,0 +1,55 @@
+---
+- hosts: ubuntu
+  become: yes
+  tasks:
+
+  - name: Install nodejs
+    #apt: name=nodejs state=latest
+    command: bash -lc "sudo apt-get install nodejs -y"
+
+  - name: Install aptitude
+    command: bash -lc "sudo apt-get install aptitude -y"
+
+  - name: Install npm
+    command: bash -lc "sudo aptitude install npm -y"
+
+  - name: Install unzip and wget
+    command: bash -lc "sudo apt-get install unzip -y && sudo apt-get install wget -y"
+    ignore_errors: yes
+
+  - name: npm install
+    command: bash -lc "cd /home/ubuntu/ && sudo npm install"
+
+  - name: pm2 install
+    command: bash -lc "cd /home/ubuntu/ && sudo npm install pm2 -g"
+
+  - name: express install
+    command: bash -lc "cd /home/ubuntu/ && sudo npm install express --save"
+
+  - name: pm2 stop
+    command: bash -lc "cd /home/ubuntu/ && sudo pm2 stop ex.js"
+    ignore_errors: yes
+
+  - name: remove json file
+    command: bash -lc "cd /home/ubuntu/ && sudo rm -rf ex.js index.html *.zip public README.md"
+    ignore_errors: yes
+
+#  - name: wget from artifactory
+#    command: bash -lc "cd /home/ubuntu/ && sudo wget http://192.168.2.5:8081/artifactory/Ansible-Nodejs-Sourcecode-POC/nodejs1.zip"
+
+#  - name: unzip json file
+#    command: bash -lc "cd /home/ubuntu/ && sudo unzip nodejs1.zip"
+
+  - name: artifactory file
+    unarchive:
+      src: http://192.168.2.5:8081/artifactory/Bamboo-Ansible-Nodejs/nodejs1.zip
+      dest: /home/ubuntu/
+      mode: 0755
+      remote_src: yes
+    become: yes
+
+  - name: pm2 start
+    command: bash -lc "cd /home/ubuntu/ && sudo pm2 start ex.js"
+
+
+

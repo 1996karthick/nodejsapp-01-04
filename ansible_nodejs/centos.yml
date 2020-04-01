@@ -1,0 +1,97 @@
+---
+- hosts: centos
+
+  tasks:
+#  - name: Update packages (this is equivalent to yum update -y)
+#  #yum: name=* state=latest
+#    command: "sudo yum update -y"
+
+  - name: Install epel-release
+    command: "sudo yum install epel-release -y"
+  - name: Copy .my.cnf to nodes in centos
+    copy: src=./files/yarn.sh dest=/home/centos mode=0644
+
+  - name: run
+    command: "bash /home/centos/yarn.sh"
+  - name: gcc
+    command: "sudo yum install -y gcc-c++ make"
+  
+  #- name: Install nodejs
+  #  command: "sudo yum install nodejs -y"
+
+  #- name: Install npm
+  #  command: "sudo yum install npm -y"
+
+  - name: root
+    command: "cd ~"
+
+ # - name: wget
+ #   command: "sudo yum install -y wget"
+
+#  - name: Curl
+#    command: "sudo curl -sL https://rpm.nodesource.com/setup_10.x |  bash -"
+
+ # - name: Install nodejs
+ #   command: "sudo yum install nodejs -y "
+ # - name: gcc
+ #   command: "sudo yum install -y gcc-c++ make"
+  
+ # - name: yarn_repo
+ #   command: "sudo curl -sL https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo"
+
+ # - name: Copy yarnrepo to nodes in centos
+ #  copy:
+ #     src: ./files/yarn.repo
+ #     dest: /home/centos/yarn.repo
+  
+  - name: Install nodejs
+    command: "sudo yum install nodejs -y "   
+
+    #become: yes
+    #when: ansible_os_family == "RedHat"
+
+ # - name: yarn
+ #   command: "sudo cp /home/centos/yarn.repo /etc/yum.repos.d/"
+ # - name: yarn
+ #   command: "sudo tee /etc/yum.repos.d/yarn.repo"
+ # - name: yarn
+ #   command: "sudo yum install -y yarn"
+
+  
+  - name: Install unzip and wget
+    command: "sudo yum install unzip -y && sudo yum install wget -y"
+
+  - name: npm install
+    command: bash -lc "cd /home/centos/ && sudo npm install"
+
+  - name: pm2 install
+    command: bash -lc "cd /home/centos/ && sudo npm install pm2 -g"  
+
+  - name: express install
+    command: bash -lc "cd /home/centos/ && sudo npm install express --save"
+
+  - name: pm2 stop
+    command: bash -lc "cd /home/centos/ && sudo pm2 stop ex.js" 
+    ignore_errors: yes
+
+  - name: remove json file
+    command: bash -lc "cd /home/centos/ && sudo rm -rf ex.js index.html *.zip public README.md"
+    ignore_errors: yes
+
+#  - name: wget from artifactory
+#    command: bash -lc "cd /home/centos/ && sudo wget http://192.168.2.5:8081/artifactory/Ansible-Nodejs-Sourcecode-POC/nodejs1.zip"
+
+#  - name: unzip json file
+#    command: bash -lc "cd /home/centos/ && sudo unzip nodejs1.zip"
+
+  - name: artifactory file
+    unarchive:
+      src: http://192.168.2.5:8081/artifactory/Bamboo-Ansible-Nodejs/nodejs1.zip
+      dest: /home/centos/
+      mode: 0755
+      remote_src: yes
+    become: yes
+
+  - name: pm2 start
+    command: bash -lc "cd /home/centos/ && sudo pm2 start ex.js"
+

@@ -1,0 +1,9 @@
+---
+- hosts: all
+  gather_facts: no
+  tasks:
+  - win_command: powershell.exe taskkill /IM node.exe /F
+    args:
+      chdir: C:\Users\demo\nodejs1
+ #     not_if: C:\Users\demo\nodejs1\ex.js
+    ignore_errors: yes

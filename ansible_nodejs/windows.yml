@@ -1,0 +1,45 @@
+---
+- hosts: windows
+  gather_facts: no
+  tasks:
+  - win_chocolatey:
+       name: chocolatey
+       state: latest
+
+  - win_command: powershell.exe choco install nodejs -y
+    args:
+      chdir: C:\Users\demo
+
+  - win_command: powershell.exe npm install express --save
+    args:
+      chdir: C:\Users\demo
+
+  - win_command: powershell.exe npm install pm2 -g
+    args:
+      chdir: C:\Users\demo
+
+ # - name: pm2 stop if already in running state
+ #   win_command: powershell.exe pm2 stop ex.js
+ #   args:
+ #     chdir: C:\Users\demo\nodejs1
+ #   ignore_errors: yes
+
+  - win_get_url:
+      url: http://192.168.2.5:8081/artifactory/Bamboo-Ansible-Nodejs/nodejs1.zip
+      dest: C:\Users\demo\
+
+  - win_unzip:
+      src: C:\Users\demo\nodejs1.zip
+      dest: C:\Users\demo\nodejs1
+
+  #- win_command: powershell.exe pm2 start ex.js ; sleep 50 ; taskkill /IM node.exe /F
+  #  args:
+  #    chdir: C:\Users\demo\nodejs1
+  #  ignore_errors: yes
+
+  - win_command: powershell.exe pm2 start ex.js
+    args:
+      chdir: C:\Users\demo\nodejs1
+ #     not_if: C:\Users\demo\nodejs1\ex.js
+    ignore_errors: yes
+
